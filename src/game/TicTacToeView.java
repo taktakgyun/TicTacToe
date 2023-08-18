@@ -14,8 +14,8 @@ public class TicTacToeView extends JFrame {
 	JLabel scoreLabel = new JLabel(" | " + score1 + " : " + score2);
 	JButton startNewGame = new JButton("새 게임 시작");
 	
-	JPanel titleBar = new JPanel();
-	JPanel nineRoom = new JPanel();
+	JPanel titleBar = new JPanel(); // 
+	JPanel nineRoom = new JPanel(); // 게임  플레이 장소
 	
 	private final int START_PLAYER = 1;
 	private boolean isGameEnd = false;
@@ -33,6 +33,7 @@ public class TicTacToeView extends JFrame {
 	}
 	
 	public void drawWindow() {
+		// 타이틀(상단) 세팅
 		titleBar.add(title);
 		titleBar.add(dispCurrentPlayer);
 		titleBar.add(scoreLabel);
@@ -41,6 +42,7 @@ public class TicTacToeView extends JFrame {
 		dispCurrentPlayer.setText("Player " + START_PLAYER);
 		add(titleBar, BorderLayout.NORTH);
 		
+		// 게임 플레이 장소 세팅
 		nineRoom.setLayout(new GridLayout(3,3));
 		for(int i = 0; i < 9; i++) {
 			JButton tempButton = new JButton("");
@@ -49,6 +51,7 @@ public class TicTacToeView extends JFrame {
 		}
 		
 		add(nineRoom, BorderLayout.CENTER);
+		
 		
 		MouseListener ml = new MouseAdapter() {
 			@Override
