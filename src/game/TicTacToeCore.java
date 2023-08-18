@@ -1,17 +1,25 @@
 package game;
 
 public class TicTacToeCore {
-private int currentPlayerNum;
-	private boolean isGameOver = false;
-	private int[][] endStage;
+	enum STATE{
+		DRAW(99), WIN_P1(1),WIN_P2(2), PLAY(0);
+		
+		private final int value;
+	    STATE(int value) { this.value = value; }
+	    public int getValue() { return value; }
+	}
+
+	private int currentPlayerNum;
 	private int currentTurn = 1;
-	
+		
 	public TicTacToeCore(int currentPlayerNum) {
-		this.currentPlayerNum = currentPlayerNum;
+		this.resetTurn();
+		this.setCurrentPlayerNum(currentPlayerNum);
 	}
 
 	public void changeTurn() {
 		currentPlayerNum = (currentPlayerNum == 1) ? 2 : 1;
+		this.countTurn();
 	}
 
 	public int getCurrentPlayerNum() {
@@ -21,22 +29,23 @@ private int currentPlayerNum;
 	public void setCurrentPlayerNum(int currentPlayerNum) {
 		this.currentPlayerNum = currentPlayerNum;
 	}	
-
-	public int[][] getEndStage() {
-		return endStage;
+	
+	public void countTurn() {
+		this.currentTurn++;
+	}
+	public void resetTurn() {
+		this.currentTurn=0;
+	}
+	public boolean isFullMap() {
+		return (this.currentTurn==9);
 	}
 
 	/**
 	 * 
 	 * @param currentStage
-	 * @return -99: 게임종료됨, 1: 플레이어 1 승리, 2: 플레이어 2 승리, 0: 진행중, 99: 비김(draw)
+	 * @return GAME_OVER(-99): 게임종료됨, WIN_P1(1): 플레이어 1 승리, WIN_P2(2): 플레이어 2 승리, PLAY(0): 진행중, DRAW(99): 비김(draw)
 	 */
-	public int inputCurrentStage(int[][] currentStage) {
-		// 게임이 끝났다면 더 이상 진행하는 의미가 없으므로 판단 중단
-		if(isGameOver) {
-			return -99;
-		}		
-		
+	public STATE inputCurrentStage(int[][] currentStage) {
 		
 		for(int i = 0; i < currentStage.length; i++) {
 			String rowStr = "";
@@ -55,24 +64,19 @@ private int currentPlayerNum;
 			// 가로 판단			
 			
 			if(isThisPlayerWin(2, rowStr, colStr, diagStr1, diagStr2)) {
-				isGameOver = true;
-				endStage = currentStage;
-				return 2;
+				return STATE.WIN_P2;
 			} else if(isThisPlayerWin(1, rowStr, colStr, diagStr1, diagStr2)) {
-				isGameOver = true;
-				endStage = currentStage;
-				return 1;
-			} else if(currentTurn == 9) {
-				return 99;
+				return STATE.WIN_P1;
+			} else if(this.isFullMap()) {
+				return STATE.DRAW;
 			} else {
 				continue;
 			}
 		}
-		currentTurn++;
-		return 0;
+		return STATE.PLAY;
 	}
 	
-	private boolean isThisPlayerWin(int playerNum, String rowFrag, String colFrag, String diagFrag1, String diagFrag2) {
+	private static boolean isThisPlayerWin(int playerNum, String rowFrag, String colFrag, String diagFrag1, String diagFrag2) {
 		String p = String.valueOf(playerNum);
 		boolean result = false;
 		String[] arr = {rowFrag, colFrag, diagFrag1, diagFrag2};
@@ -84,9 +88,7 @@ private int currentPlayerNum;
 	}
 	
 	public void resetGame(int currentPlayerNum) {
-		this.isGameOver = false;
 		this.currentPlayerNum = currentPlayerNum;
-		this.endStage = null;
-		this.currentTurn = 1;
+		this.resetTurn();
 	}
 }

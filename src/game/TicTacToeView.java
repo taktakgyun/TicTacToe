@@ -3,6 +3,7 @@ package game;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import game.TicTacToeCore.STATE;
 
 public class TicTacToeView extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -17,7 +18,7 @@ public class TicTacToeView extends JFrame {
 	JPanel titleBar = new JPanel(); // 
 	JPanel nineRoom = new JPanel(); // 게임  플레이 장소
 	
-	private final int START_PLAYER = 1;
+	private int START_PLAYER = 1;
 	private boolean isGameEnd = false;
 	TicTacToeCore ttt = new TicTacToeCore(START_PLAYER);
 	
@@ -27,12 +28,14 @@ public class TicTacToeView extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         
-        this.drawWindow();
+        this.setWindow();
+        this.setActionOfNineRoom();
+        this.setActionOfStartNewGame();
         this.setVisible(true);       
 
 	}
 	
-	public void drawWindow() {
+	public void setWindow() {
 		// 타이틀(상단) 세팅
 		titleBar.add(title);
 		titleBar.add(dispCurrentPlayer);
@@ -51,13 +54,27 @@ public class TicTacToeView extends JFrame {
 		}
 		
 		add(nineRoom, BorderLayout.CENTER);
+	}
+	
+	public void setActionOfStartNewGame() {
+		startNewGame.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ttt.resetGame(START_PLAYER);
+				isGameEnd = false;
+				for(int i = 0; i < nineRoom.getComponents().length; i++) {
+					((JButton)nineRoom.getComponent(i)).setText("");
+				}
+			
+			}
+		});
 		
-		
+	}
+	public void setActionOfNineRoom() {
 		MouseListener ml = new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				JButton tempButton = (JButton)e.getComponent();
-				// System.out.println(ttt.getCurrentPlayerNum());
 				if(isGameEnd) {
 					return;
 				}
@@ -77,25 +94,25 @@ public class TicTacToeView extends JFrame {
 				
 				int[][] ticArr = new int[3][3];
 				for(int i = 0; i < ticArr.length; i++) {
-					for(int j = 0; j < ticArr[0].length; j++) {
+					for(int j = 0; j < ticArr[i].length; j++) {
 						String pl = ((JButton)nineRoom.getComponent(j + i * 3)).getText();
 						if(pl.equals("O"))	ticArr[i][j] = 1;
 						else if(pl.equals("X"))	ticArr[i][j] = 2;
 						else	ticArr[i][j] = 0;
 					}					
 				}
-				int result = ttt.inputCurrentStage(ticArr);
+				STATE result = ttt.inputCurrentStage(ticArr);
 				System.out.println("result: " + result);
-				if(result == 1 || result == 2) {
+				if(result == STATE.WIN_P1 || result == STATE.WIN_P2) {
 					JOptionPane.showMessageDialog(nineRoom, "플레이어 " + result + "의 승리입니다.");
-					if(result == 1) {
+					if(result == STATE.WIN_P1) {
 						score1++;
 					} else {
 						score2++;
 					}
 					scoreLabel.setText(" | " + score1 + " : " + score2);
 					isGameEnd = true;
-				} else if (result == 99) {
+				} else if (result == STATE.DRAW) {
 					JOptionPane.showMessageDialog(nineRoom, "비겼습니다.");
 					isGameEnd = true;
 				}
@@ -106,17 +123,5 @@ public class TicTacToeView extends JFrame {
 		for(Component c : nineRoom.getComponents()) {
 			c.addMouseListener(ml);
 		}
-		
-		startNewGame.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ttt.resetGame(START_PLAYER);
-				isGameEnd = false;
-				for(int i = 0; i < nineRoom.getComponents().length; i++) {
-					((JButton)nineRoom.getComponent(i)).setText("");
-				}
-			
-			}
-		});
 	}
 }
